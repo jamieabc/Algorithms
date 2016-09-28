@@ -1,86 +1,52 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/* #define MAX_INTS 100000 */
-#define MAX_INTS 100
+#define MAX_INTS 100000
+#define DEBUG 0
 
-int load_integers(const char * filename, int* array, int length)
-{
-    FILE *fp = NULL;
-    int value;
-    int i = -1;
-
-    if ((fp = fopen (filename, "r")) == NULL)
-        return -1;
-
-    while (fscanf (fp, "%i", &value) && !feof(fp) && ++i < length)
-        array[i] = value;
-
-    fclose (fp);
-    return i + 1;
+/* exit program if not input file is provided */
+void check_input_parameter(int argc) {
+  if (argc == 1) {
+    printf("Usage: a.out [file_name]\n");
+    printf("file_name is not found!");
+    exit(-1);
+  }
 }
 
-void swap(int* array, int i, int j)
-{
-    if (i == j) return;
+int read_file(const char *file_name, int *array) {
+  FILE *fp = fopen(file_name, "r");
+  int integer = 0;
 
-    int tmp = array[j];
-    array[j] = array[i];
-    array[i] = tmp;
+  /* exit if file not exist */
+  if (!fp) {
+    printf("file '%s' doesn not exist, please check it!", file_name);
+    exit(-1);
+  }
+
+  for (int i = 0; i < MAX_INTS; ++i) {
+    fscanf(fp, "%d", &integer);
+    if (!feof(fp)) {
+      array[i] = integer;
+    } else {
+      return i;
+    }
+  }
+  return 0;
 }
 
-int partition_first_pivot(int* array, int length)
-{
-    int pivot = array[0];
-    int i = 1;
-    int j = 1;
+int main(int argc, char **argv) {
+  int array[MAX_INTS], array_size = 0;
 
-    for (; j < length; j++) {
-        if (array[j] < pivot) {
-           swap(array, i, j);
-           i++;
-        }
-    }
-    swap(array, 0, i - 1);
-    return i - 1;
-}
+  check_input_parameter(argc);
+  array_size = read_file(argv[1], array);
+#ifdef DEBUG
+  printf("array size %d with following content:\n", array_size);
+  for (int i = 0; i < array_size; ++i) {
+    printf("%d ", array[i]);
+  }
+  printf("\n");
+#endif
 
-long long quick_sort_and_count_comparisons(int* array, int length)
-{
-    if (length <= 1) return 0;
-
-    int comparisons = length - 1;
-
-    int pos = partition_first_pivot(array, length);
-
-    return comparisons +
-           quick_sort_and_count_comparisons(array, pos) +
-           quick_sort_and_count_comparisons(array + pos + 1, length - pos - 1);
-}
-
-int main(int argc, char *argv[])
-{
-    static int integers[MAX_INTS];
-
-    int num_ints = 0;
-
-    if (argc < 2) {
-        fprintf(stderr, "%s <file>\n", argv[0]);
-        return -1;
-    }
-
-    if ((num_ints = load_integers(argv[1], integers, MAX_INTS)) <= 0) {
-        fprintf(stderr, "Error on reading intergers from file: %s\n", argv[1]);
-        return -1;
-    }
-
-    long long comparisons = quick_sort_and_count_comparisons(integers, num_ints);
-    printf("comparisons: %lli\n", comparisons);
-/*
-    int i = 0;
-    for (; i < num_ints; i++) {
-        printf("%i\n", integers[i]);
-    }
-*/
-    return 0;
+  return 0;
 }
