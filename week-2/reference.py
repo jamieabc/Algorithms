@@ -148,14 +148,14 @@ for line in f:
 f.close()
 
 # firstcomparison
-# quick_sort1(intarray, 0, len(intarray))
-# print firstcomparison
+quick_sort1(intarray, 0, len(intarray))
+print firstcomparison
 
 # lastcomparison
 # quicksort_last(intarray, 0, len(intarray))
 # print lastcomparison
 
 #test on an array of length 10000
-mediancomparison = 0
-quicksort_median(intarray, 0, len(intarray))
-print mediancomparison
+#mediancomparison = 0
+#quicksort_median(intarray, 0, len(intarray))
+#print mediancomparison
